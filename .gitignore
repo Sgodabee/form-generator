@@ -1,0 +1,19 @@
+# ── Backend ──────────────────────────────────────────
+backend/target/
+backend/*.class
+backend/.idea/
+backend/*.iml
+
+# Generated PDFs (runtime output)
+backend/src/main/resources/pdf-output/*.pdf
+
+# ── Frontend ─────────────────────────────────────────
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+
+# ── OS / IDE ─────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/
+*.log

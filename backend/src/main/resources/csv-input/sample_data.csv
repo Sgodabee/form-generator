@@ -1,0 +1,6 @@
+first_name,last_name,id_number,date_of_birth,product_code,premium_amount
+John,Doe,8801015009087,1988-01-01,INV-001,1500.00
+Jane,Smith,9203124800088,1992-03-12,INV-002,2300.50
+Peter,Jones,7506238500185,1975-06-23,INV-003,980.75
+Mary,Williams,8412197200281,1984-12-19,INV-004,4100.00
+David,Brown,9008055600380,1990-08-05,INV-001,1500.00
