@@ -1,0 +1,150 @@
+<div class="dashboard">
+
+  <!-- Header -->
+  <header class="header" role="banner">
+    <div class="header-inner">
+      <div class="header-brand">
+        <h1>Form Generator</h1>
+        <span class="header-sub">Intelligent Reporting</span>
+      </div>
+      <div class="header-user">
+        <span class="welcome-text" aria-label="Logged in as {{ username }}">
+          Hello, <strong>{{ username }}</strong>
+        </span>
+        <button class="btn-logout" (click)="logout()" aria-label="Log out">
+          Log Out
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+
+    <!-- Generate Section -->
+    <section class="card generate-card" aria-labelledby="generate-heading">
+      <h2 id="generate-heading">Generate PDF Form</h2>
+      <p class="card-desc">
+        Reads the latest CSV from the input store, maps all fields to a PDF,
+        and saves the output to both the local store and Amazon S3.
+      </p>
+
+      <button
+        class="btn-primary btn-generate"
+        (click)="generate()"
+        [disabled]="isGenerating"
+        aria-label="Start form generation"
+      >
+        <span *ngIf="isGenerating" class="spinner" aria-hidden="true"></span>
+        <span>{{ isGenerating ? 'Generating...' : 'Generate PDF' }}</span>
+      </button>
+
+      <!-- Error -->
+      <div *ngIf="generationError" class="alert alert-error" role="alert">
+        {{ generationError }}
+      </div>
+
+      <!-- Success result -->
+      <div *ngIf="lastResult" class="result-panel" role="status" aria-live="polite">
+        <h3>Generation Complete</h3>
+
+        <div class="result-grid">
+          <div class="result-item">
+            <span class="result-label">PDF File</span>
+            <span class="result-value">{{ lastResult.pdfFileName }}</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Local Destination</span>
+            <span class="result-value mono">{{ lastResult.localDestination }}</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">S3 Destination</span>
+            <span class="result-value mono">{{ lastResult.s3Destination }}</span>
+          </div>
+        </div>
+
+        <div class="speed-comparison">
+          <h4>Transfer Speed Comparison</h4>
+          <div class="speed-grid">
+            <div class="speed-item"
+                 [class.speed-winner]="lastResult.localTransferMillis <= lastResult.s3TransferMillis">
+              <span class="speed-store">Local Store</span>
+              <span class="speed-ms">{{ lastResult.localTransferMillis }} ms</span>
+            </div>
+            <div class="speed-divider">vs</div>
+            <div class="speed-item"
+                 [class.speed-winner]="lastResult.s3TransferMillis < lastResult.localTransferMillis">
+              <span class="speed-store">Amazon S3</span>
+              <span class="speed-ms">{{ lastResult.s3TransferMillis }} ms</span>
+            </div>
+          </div>
+          <p class="speed-verdict">
+            <strong>{{ fasterStore(lastResult) }}</strong> was faster this run.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Generated PDFs List -->
+    <section class="card files-card" aria-labelledby="files-heading">
+      <div class="card-header-row">
+        <h2 id="files-heading">Generated PDF Files</h2>
+        <button class="btn-secondary" (click)="loadFiles()" aria-label="Refresh file list">
+          Refresh
+        </button>
+      </div>
+
+      <div *ngIf="isLoadingFiles" class="loading-text" aria-live="polite">Loading files...</div>
+
+      <ul *ngIf="!isLoadingFiles && pdfFiles.length > 0" class="file-list" role="list">
+        <li *ngFor="let file of pdfFiles" class="file-item" role="listitem">
+          <span class="file-icon" aria-hidden="true">📄</span>
+          <span class="file-name">{{ file }}</span>
+        </li>
+      </ul>
+
+      <p *ngIf="!isLoadingFiles && pdfFiles.length === 0" class="empty-state">
+        No PDF files have been generated yet.
+      </p>
+    </section>
+
+    <!-- Audit Logs -->
+    <section class="card audit-card" aria-labelledby="audit-heading">
+      <div class="card-header-row">
+        <h2 id="audit-heading">Audit Log</h2>
+        <button class="btn-secondary" (click)="loadAuditLogs()" aria-label="Refresh audit logs">
+          Refresh
+        </button>
+      </div>
+
+      <div *ngIf="isLoadingAudit" class="loading-text" aria-live="polite">Loading audit logs...</div>
+
+      <div *ngIf="!isLoadingAudit && auditLogs.length > 0" class="table-wrapper" role="region" aria-label="Audit log table">
+        <table class="audit-table">
+          <thead>
+            <tr>
+              <th scope="col">Timestamp</th>
+              <th scope="col">User</th>
+              <th scope="col">CSV Input</th>
+              <th scope="col">PDF Output</th>
+              <th scope="col">Destination</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let log of auditLogs">
+              <td>{{ log.timestamp | date:'yyyy-MM-dd HH:mm:ss' }}</td>
+              <td>{{ log.username }}</td>
+              <td class="mono">{{ log.csvFileInput }}</td>
+              <td class="mono">{{ log.pdfFileOutput }}</td>
+              <td class="mono">{{ log.fileDestination }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p *ngIf="!isLoadingAudit && auditLogs.length === 0" class="empty-state">
+        No audit records found yet.
+      </p>
+    </section>
+
+  </main>
+</div>
